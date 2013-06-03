@@ -441,8 +441,9 @@ var game = {
     }
 
     if(data.play != undefined) {
-      $('challenge-track').play();
       $('challenge-track').currentTime = data.play;
+      $('challenge-track').play();
+      return;
     }
 
     if(data.pause != undefined) {

@@ -139,7 +139,7 @@ var ui = {
         $('guess-entry').setAttribute('wrong', 'true');
       else
         $('guess').off();
-    });
+    }, true);
 
 
     $on('start-button', 'click', function() { game.start(); });
