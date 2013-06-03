@@ -131,56 +131,31 @@ input[type="text"]:focus {
  *  Time-Count
  */
 #time-count {
-  display: none;
   z-index: 1500;
   position: fixed;
   overflow: hidden;
 
-  width: 100%;
-  height: 100%;
-  top: 0%;
-  left: 0%;
-}
-
-#time-count p {
   text-align: center;
   font-size: 170px;
   color: white;
 
-  width: 250px;
-  height: 200px;
-  margin: 500px auto;
   border-radius: 100px;
   background-color: rgba(0, 0, 0, 0.7);
+
+  opacity: 0.0;
+  transition: opacity 0.4s linear;
+
+  top: calc(50% - 100px);
+  left: -100%;
 }
 
-#time-count > div {
-  animation-play-state: paused;
-  animation-duration: 11s;
-  animation-name: fade;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
 
 #time-count[active] {
-  display: block;
-}
+  opacity: 1.0;
 
-#time-count[active] > div {
-  animation-play-state: running;
-}
-
-@keyframes fade {
-  5%, 15%, 25%, 35%, 45%, 55%, 65%, 75%, 85%, 95% { opacity: 0; }
-  0%, 10%, 20%, 30%, 40%, 50%, 60%, 70%, 80%, 90%, 100% { opacity: 1.0; }
-
-  0% {
-    margin-top: -500px;
-  }
-
-  100% {
-    margin-top: calc( (700px - 100%) * 11 );
-  }
+  left: calc(50% - 125px);
+  width: 250px;
+  height: 200px;
 }
 
 
@@ -264,7 +239,6 @@ input[type="text"]:focus {
  *  Welcome panel
  */
 #start-button {
-  float: center;
   font-size: 14pt;
   margin-top: 5px;
 }
@@ -277,11 +251,17 @@ input[type="text"]:focus {
   margin-bottom: 15px;
 }
 
+
 #game audio {
-  margin-top: -15px;
-  margin: auto;
   min-width: 30%;
+  position: absolute;
+  margin-top: -50px;
+  left: 30%;
 }
+
+
+/*  Since there is an issue with the audio controls, we can't use the panel
+ *  system */
 
 
 #lyrics-container {
@@ -386,7 +366,7 @@ input[type="text"]:focus {
 .expandable .label span {
   margin-left:10px;
   border-bottom: 1px white solid;
-  width: 90%
+  width: 90%;
   font-size: 12pt;
 }
 
@@ -408,11 +388,11 @@ input[type="text"]:focus {
 
 @keyframes doblink {
   0% {
-    box-shadow: inset 0px 0px 1em #533154;
+    border: #533154 2px solid;
   }
 
   100% {
-    box-shadow: inset 20px 20px #a97faa;
+    border: #a97faa 2px solid;
   }
 }
 

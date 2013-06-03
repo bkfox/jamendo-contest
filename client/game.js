@@ -1,12 +1,16 @@
 var channel = null;
 
-
+/** 
+ *  TODO: - s'il n'y a pas les paroles, inventez-les
+ *        - move body!
+ */
 var challenges = [
-  ' must SING on the music <small>(prepare the umbrella)</small>',
+  ' must SING (INVENT if needed) on the music <small>(prepare the umbrella)</small>',
   ' must DANSE on the music <small>(follow him in his gigue)</small>',
   ' must DANSE ALONE on the music <small>(point the finger to him)</small>',
   ' must PLAYBACK on the music',
-  ' must CHOOSE A CHALLENGE and DO IT'
+  ' must DO WHATEVER you want',
+  ' must RICKROLL... &#9835; Yeah... &#9833; Yeah... &#9836;'
 ]
 
 
@@ -46,12 +50,7 @@ var handlers = {
 
         // i am the next one
         case 'next':
-          game.challenge();
-          break;
-
-        // new challenge
-        case 'challenge':
-          game.challenge(msg, peer);
+          game.newChallenge();
           break;
 
         // got a reward from someone
@@ -59,8 +58,8 @@ var handlers = {
           game.reward(msg, peer);
           break
 
-        // TODO
-        //case 'sync':
+        case 'sync':
+          game.onGameSync(msg.sync, peer);
       }
     }
   },
@@ -177,8 +176,11 @@ var game = {
         $('players').appendChild(peer.ui);
       }
 
-      // TODO: send game state
       ui.notify(peer.data.nickname + ' is connected');
+
+      if(run.current == channel.me) {
+        peer.sendString({ sync: { started: true } });
+      }
     }
 
 
@@ -188,7 +190,6 @@ var game = {
 
     // bye peer
     channel.ondisconnect = function (peer, peers) {
-      // TODO: manage if the master leaves
       ui.notify(peer.data.nickname + ' left the game');
 
       if(peer.ui) {
@@ -202,34 +203,38 @@ var game = {
       }
 
       if(!Object.keys(channel.peers).length) {
-        $('ann-panel').off();
-        $('challenge-track').pause();
-        $('time-count').removeAttribute('active');
+        game.reset(true);
+        return;
       }
-      else if(run.current.me)
-        game.checkDone();
-    }
 
+      if(run.current.me)
+        game.checkDone();
+      else if(peer == run.current) {
+        // TODO
+      }
+    }
 
     // connect
     channel.connect();
   },
 
 
-  reset: function() {
-    ui.panel = 'index-panel';
+  reset: function(stay) {
+    if(!stay) {
+        ui.panel = 'index-panel';
 
-    if(channel) {
-      channel.close()
-      channel = null;
+      if(channel) {
+        channel.close()
+        channel = null;
+      }
+
+      $('players').innerHTML = "";
     }
 
-    $('players').innerHTML = "";
     $('chat-content').innerHTML = "";
     $('guess-off').innerHTML = "";
     $('ann-panel').off();
     $('challenge-track').pause();
-    $('time-count').removeAttribute('active');
 
     run = {
       stream: run.stream
@@ -243,7 +248,7 @@ var game = {
 
     if(Object.keys(channel.peers).length == 0) {
       alert('Dude, this game is made to be played with your friends.');
-//      return;
+      return;
     }
 
     run.started = true;
@@ -261,59 +266,32 @@ var game = {
     $('ann-panel').on();
 
     if(peer.me)
-      game.challenge();
+      game.newChallenge();
   },
 
 
-  challenge: function(msg, peer) {
-    // if it is my challenge...
-    if(!msg) {
-      var n = Math.floor(Math.random() * challenges.length);
-      run.challenge = challenges[n];
-      run.track = tracks.pick();
-
-      if(!run.track) {
-        ui.notify('Eyh, there is no track for the given types (' + config.filter + ')');
-        return tracks.load(null, game.challenge);
-      }
-
-      channel.broadcastString({ challenge: n, track: run.track });
-
-      peer = channel.me;
-    }
-    else {
-      run.track = msg.track;
-      run.challenge = challenges[msg.challenge];
+  /**
+   *  Create a new challenge, and take the hand
+   */
+  newChallenge: function(msg, peer) {
+    var d = { challenge:  Math.floor(Math.random() * challenges.length),
+              track:      tracks.pick() };
+    var track = tracks.pick();
+    if(!d.track) {
+      ui.notify('Eyh, there is no track for the given types (' + config.filter + ') or Jamendo has a problem for the moment');
+      return;
     }
 
-    // temporary show
-    $('challenge-track').pause();
-    $('challenge-track').src = run.track.stream;
-    $('guess').off();
-    $('game-top').off();
-    if(peer == channel.me)
-      $('reward-panel').on();
-    else
-      $('reward-panel').off();
-    $('guess-entry').removeAttribute('wrong', 'true');
-    $('players').panel = null;
-
-    for(var i in channel.peers)
-      channel.peers[i].data.reward = 0;
-
-    run.current = peer;
-    run.totalReward = 0;
-
-    $('time-count').setAttribute('active', 'true');
-    window.setTimeout(function() {
-      game._challenge();
-    }, 11000);
+    game.gameSync(d);
   },
 
 
-  _challenge: function() {
-    $('time-count').removeAttribute('active');
+  /**
+   *  Start the current challenge
+   */
+  startChallenge: function() {
     $('ann-panel').on();
+    $('challenge-track').style.display = "inline";
 
     // start challenge itself
     var track = run.track;
@@ -356,7 +334,8 @@ var game = {
   checkDone: function () {
     var looser = channel.me;
     for(var i in channel.peers) {
-      if(!channel.peers[i].data.reward && channel.peer[i] != channel.me)
+      if(channel.peers[i].data.reward == undefined &&
+         channel.peer[i] != channel.me)
         return false;
       if(channel.peers[i].data.score < looser.data.score)
         looser = channel.peers[i];
@@ -374,11 +353,12 @@ var game = {
   reward: function (msg, peer) {
     if(run.current.me) {
       // peer.data.score -= msg.reward; automatically done by the peer
-      channel.me.data.score += msg.reward;
       peer.data.reward = msg.reward;
-      run.totalReward += msg.reward;
-
-      ui.notify('You got ' + msg.reward + ' points from ' + peer.data.nickname);
+      if(msg.reward) {
+        channel.me.data.score += msg.reward;
+        run.totalReward += msg.reward;
+        ui.notify('You got ' + msg.reward + ' points from ' + peer.data.nickname);
+      }
       this.checkDone();
     }
     else
@@ -397,6 +377,88 @@ var game = {
 
   sync: function () {
     channel.broadcastString({ status: channel.me.data });
+  },
+
+
+  gameSync: function(data) {
+    // run.peer == channel.me
+    if(data.challenge) {
+      channel.broadcastString({ sync: { challenge: data.challenge, track: data.track }});
+
+      function foo(j) {
+        window.setTimeout(function() {
+          channel.broadcastString({ sync: { left: 10-j }});
+          game.onGameSync({ left: 10-j }, channel.me);
+        }, j*1000);
+      }
+      for(var i = 0; i < 11; i++)
+        foo(i);
+
+      game.onGameSync({ challenge: data.challenge, track: data.track }, channel.me);
+      return;
+    }
+
+    if(data.play != undefined)
+      channel.broadcastString({ sync: { play: data.play } });
+    if(data.pause)
+      channel.broadcastString({ sync: { pause: true } });
+  },
+
+
+  onGameSync: function(data, peer) {
+    if(data.challenge) {
+      run.track = data.track;
+      run.challenge = challenges[data.challenge];
+      run.current = peer;
+      run.totalReward = 0;
+
+      $('challenge-track').pause();
+      $('challenge-track').src = run.track.stream;
+      $('challenge-track').style.display = "none";
+      $('guess').off();
+      $('game-top').off();
+
+      if(peer == channel.me)
+        $('reward-panel').on();
+      else
+        $('reward-panel').off();
+
+      $('guess-entry').removeAttribute('wrong', 'true');
+      $('players').panel = null;
+
+      for(var i in channel.peers)
+        delete channel.peers[i].data.reward;
+
+      return;
+    }
+
+
+    if(data.left != undefined) {
+      $('time-count').setAttribute('active', 'true');
+      $('time-count').innerHTML = data.left;
+      window.setTimeout(function() {
+        $('time-count').removeAttribute('active');
+        if(data.left == 0)
+          game.startChallenge();
+      }, 500);
+    }
+
+    if(data.play != undefined) {
+      $('challenge-track').play();
+      $('challenge-track').currentTime = data.play;
+    }
+
+    if(data.pause != undefined) {
+      $('challenge-track').pause();
+      if(peer != channel.me)
+        ui.notify(peer.data.nickname + ' has paused the music');
+    }
+
+    if(data.started != undefined) {
+      // i know kinda weird
+      peer.sendString({ reward: 0 });
+      $('ann-panel').panel = 'game-started';
+    }
   },
 }
 

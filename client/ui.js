@@ -150,6 +150,15 @@ var ui = {
         game.doReward(parseInt(e.currentTarget.value));
       });
     }
+
+
+    $on('challenge-track', 'play', function() {
+      game.gameSync({ play: $('challenge-track').currentTime });
+    });
+
+    $on('challenge-track', 'pause', function() {
+      game.gameSync({ pause: true });
+    });
   },
 
 

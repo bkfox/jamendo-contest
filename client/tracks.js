@@ -127,16 +127,19 @@ var tracks = {
   },
 
 
-  load: function(filter, cb) {
+  load: function(filter, cb, volatile) {
     if(filter && filter.length) {
-      config.filter = filter;
+      if(!volatile)
+        config.filter = filter;
       filter = '&fuzzytags=' + filter.replace(/[^a-zA-Z]+/gi, '+');
     }
     else {
-      delete config.filter;
+      if(!volatile)
+        delete config.filter;
       filter = ''
     }
-    config.save();
+    if(!volatile)
+      config.save();
 
     xhrGet('http://api.jamendo.com/v3.0/tracks/?client_id=' + config.jamendoID +
            '&format=json&limit=100&audioformat=ogg' + filter +
@@ -201,7 +204,6 @@ var tracks = {
     if(value == l[0])   n = 1;
     if(value == l[1])   n = 2;
     if(value == l[2])   n = 3;
-
     if(peer && n)
       peer.data.score += n;
 
