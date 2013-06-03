@@ -143,7 +143,7 @@ var game = {
 
     // hey, you wanna come?
     channel.onpeerrequest = function (m) {
-      return Object.keys(channel.peers).length < 3;
+      return Object.keys(channel.peers).length < 3 && !run.started;
     }
 
     // hello peer
@@ -177,10 +177,6 @@ var game = {
       }
 
       ui.notify(peer.data.nickname + ' is connected');
-
-      if(run.current == channel.me) {
-        peer.sendString({ sync: { started: true } });
-      }
     }
 
 
@@ -383,6 +379,7 @@ var game = {
   gameSync: function(data) {
     // run.peer == channel.me
     if(data.challenge) {
+      run.started = true;
       channel.broadcastString({ sync: { challenge: data.challenge, track: data.track }});
 
       function foo(j) {

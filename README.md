@@ -7,6 +7,7 @@ PlasmaQuizz is a video-chat web game, where players must complete challenges on 
 
 It encourage cooperation in the way that players give their own points to score the others, and help to discover a lot of artists from Jamendo.
 
+**Important Note**: Because it uses WebRTC, that is a technology not yet stabilized, only beta versions of web browsers, such as Firefox Nightly ( http://nightly.mozilla.org ) can run this game for the moment.
 
 Screenshots
 -----------
