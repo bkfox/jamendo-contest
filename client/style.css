@@ -1,0 +1,500 @@
+
+body {
+  margin: 0px;
+  /* padding-top: 20px; */
+  font-family: Serif, Times;
+  font-size: 10pt;
+  background-color: #ddf;
+}
+
+
+a {
+  cursor: pointer;
+  color: #333;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #bbb;
+}
+
+
+input {
+  border: 1px #693f6a solid;
+}
+
+
+.column {
+  /* display: inline-block; */
+  display: block;
+  float: left;
+  width: 49%;
+  height: 100%;
+  transition: height 0.2s linear;
+}
+
+
+.box {
+  margin: 5px;
+  border: 1px #693f6a solid;
+  border-radius: 5px;
+  font-size: 10pt;
+  background: rgba(255,255,255,0.7);
+}
+
+
+/*.box .toolbar {
+  border: none;
+  border-bottom: 1px grey solid;
+  border-radius: 5px;
+  height: 20px;
+  padding: 0px;
+}*/
+
+
+.toolbar {
+  height: 20px;
+  width: 100%;
+  background-color: #693f6a;
+  background: linear-gradient(to bottom, #693f6a, #432144);
+  color: #fff;
+}
+
+.toolbar * {
+  color: #fff;
+  vertical-align: bottom;
+}
+
+
+button {
+  background: linear-gradient(to top, #533154, #794f7a);
+  border-radius: 5px;
+  border: 1px ;
+  color: #f9fffa;
+  padding: 0px 10px;
+}
+
+button:hover,
+.toolbar a:hover {
+  background: linear-gradient(to top, #634164, #895f8a);
+}
+
+input[type="text"] {
+  border-radius: 5px;
+  background-color: #432144;
+  background: linear-gradient(to bottom, #432144, #693f6a);
+  margin: 0px;
+  margin-bottom: 1px;
+  padding: 1px;
+  color: #f9fffa;
+}
+
+input[type="text"]:focus {
+  background-color: #533154;
+  background: linear-gradient(to bottom, #533154, #794f7a);
+}
+
+
+/*******************************************************************************
+ *  General classes
+ ******************************************************************************/
+/**
+ *  Panel
+ */
+.panel > * {
+  display: none;
+}
+
+.panel > *[active] {
+  display: inherit;
+}
+
+
+/*******************************************************************************
+ *  General & whatever
+ ******************************************************************************/
+#main-container {
+  height: 95%;
+  padding: 0px;
+  margin: 0px;
+}
+
+#notifications {
+  float: left;
+  width: 50%;
+  padding-left: 10px;
+  font-size: 8pt;
+}
+
+
+/**
+ *  Time-Count
+ */
+#time-count {
+  display: none;
+  z-index: 1500;
+  position: fixed;
+  overflow: hidden;
+
+  width: 100%;
+  height: 100%;
+  top: 0%;
+  left: 0%;
+}
+
+#time-count p {
+  text-align: center;
+  font-size: 170px;
+  color: white;
+
+  width: 250px;
+  height: 200px;
+  margin: 500px auto;
+  border-radius: 100px;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+#time-count > div {
+  animation-play-state: paused;
+  animation-duration: 11s;
+  animation-name: fade;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+#time-count[active] {
+  display: block;
+}
+
+#time-count[active] > div {
+  animation-play-state: running;
+}
+
+@keyframes fade {
+  5%, 15%, 25%, 35%, 45%, 55%, 65%, 75%, 85%, 95% { opacity: 0; }
+  0%, 10%, 20%, 30%, 40%, 50%, 60%, 70%, 80%, 90%, 100% { opacity: 1.0; }
+
+  0% {
+    margin-top: -500px;
+  }
+
+  100% {
+    margin-top: calc( (700px - 100%) * 11 );
+  }
+}
+
+
+/*******************************************************************************
+ *  Index panel
+ ******************************************************************************/
+#index-panel {
+  text-align:center;
+  font-family: arial;
+}
+
+#index-panel h1 {
+  margin-top: 50px;
+}
+
+#index-panel ol {
+  margin-top: 50px;
+  text-align:left;
+  width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 20pt;
+  font-weight: bold;
+  color: #693f6a;
+}
+
+#index-panel button {
+  padding: 10px;
+  font-size: 20px;
+  border-radius: 10px;
+  border: 1px grey solid;
+  cursor: pointer;
+  background-color: rgba(136, 136, 255, 0.3);
+}
+
+
+#index-panel button:hover {
+  background-color: rgba(136, 170, 255, 0.6);
+}
+
+
+/*******************************************************************************
+ *  Game Panel
+ ******************************************************************************/
+#game-panel > .column:first-child {
+  width: 75%;
+}
+
+#game-panel > .column:last-child {
+  width: 20%;
+  float: right;
+}
+
+/*******************************************************************************
+ *  Game Announces
+ ******************************************************************************/
+#ann {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  height: 150px;
+  overflow: hidden;
+  padding-right: 30px;
+}
+
+
+#ann-panel {
+  width: calc(100% - 10px);
+  height: 100%;
+  text-align: center;
+  font-size: 12pt;
+  z-index: 900;
+  float: left;
+}
+
+#ann-panel .panel {
+  height: auto;
+}
+
+
+/**
+ *  Welcome panel
+ */
+#start-button {
+  float: center;
+  font-size: 14pt;
+  margin-top: 5px;
+}
+
+
+/**
+ *  Game panel
+ */
+#game > div {
+  margin-bottom: 15px;
+}
+
+#game audio {
+  margin-top: -15px;
+  margin: auto;
+  min-width: 30%;
+}
+
+
+#lyrics-container {
+  display: none;
+  font-style: italic;
+  overflow: auto;
+}
+
+#challenge {
+  font-weight: bold;
+}
+
+
+
+#guess a {
+  background: none;
+  text-decoration: underline;
+  color: grey;
+}
+
+#guess * {
+  height: auto;
+}
+
+#guess a:hover {
+  color: white;
+}
+
+#guess-off {
+  width: 80%;
+  height: auto;
+}
+
+#guess-off img {
+  float: left;
+  width: 100px;
+  margin-top: -50px;
+  margin-left: 15px;
+}
+
+#guess-entry {
+  width: 40%;
+}
+
+#guess-entry[wrong] {
+  background-color: #f00;
+  background: linear-gradient(to bottom, #f00, #f33);
+}
+
+
+
+/**
+ * Expandable: configuration, ...
+ */
+.expandable {
+  z-index: 1000;
+  float: right;
+  margin-right: -30px;
+  overflow: hidden;
+
+  width: 20px;
+  height: 150px;
+  padding-left: 5px;
+
+  border-left: 2px #693f6a solid;
+  background: linear-gradient(to top, #533154, #794f7a);
+}
+
+.expandable + .expandable {
+  margin-top: 30px;
+  height: calc(100% - 30px);
+}
+
+.expandable:hover {
+  width: 40%;
+  height: 150px;
+  margin-top: -150px;
+}
+
+.expandable:hover + .expandable {
+  display: none;
+}
+
+.expandable > div {
+  display: none;
+  width: 100%;
+}
+
+.expandable:hover > div {
+  display: block;
+}
+
+
+.expandable .label {
+  font-size: 14pt;
+  font-weight: bold;
+  display: block;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.expandable .label span {
+  margin-left:10px;
+  border-bottom: 1px white solid;
+  width: 90%
+  font-size: 12pt;
+}
+
+.expandable input {
+  margin: 5px;
+  margin-top: 0px;
+  float: right;
+}
+
+
+.expandable[blink] {
+  animation-duration: 1s;
+  animation-name: doblink;
+  animation-timing-function: linear;
+  animation-iteration-count: 20;
+  animation-direction: alternate;
+  background: linear-gradient(to top, #533154, #794f7a);
+}
+
+@keyframes doblink {
+  0% {
+    box-shadow: inset 0px 0px 1em #533154;
+  }
+
+  100% {
+    box-shadow: inset 20px 20px #a97faa;
+  }
+}
+
+/*******************************************************************************
+ *  Player widget
+ ******************************************************************************/
+#players {
+  height: calc(100% - 160px);
+}
+
+.player {
+  display: inline-block;
+  margin-left: 5px;
+  width: calc(25% - 5px);
+  height: 300px;
+  text-align: center;
+  float: left;
+}
+
+.player video.box {
+  width: calc(100% - 10px);
+  margin: 4px;
+  background-color: grey;
+}
+
+.player[active] video.box {
+  border-color: #aaaa44;
+  border-width: 5px;
+  margin: 0px;
+  float: center;
+}
+
+.player[active] {
+  width: calc(25% + 100px);
+  max-height: 100%;
+}
+
+
+/*******************************************************************************
+ *  Chat
+ ******************************************************************************/
+#chat-box {
+  height: 100%;
+  padding: 0px;
+  margin-bottom: 0px;
+  overflow: hidden;
+}
+
+#chat-content-container {
+  height: calc(100% - 20px);
+  overflow: auto;
+}
+
+#chat-content {
+  margin-top: -1px;
+}
+
+#chat-content div {
+  padding: 5px;
+}
+
+#chat-content .notification {
+  font-style: italic;
+  font-size: 10pt;
+  color: grey;
+  background-color: white;
+  border-bottom: 1px #ddd solid;
+}
+
+#chat-content *:not(.notification) + .notification {
+  border-top: 1px #ddd solid;
+}
+
+
+#chat-input {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  width: 100%;
+  height: 20px;
+  margin: 0px;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+

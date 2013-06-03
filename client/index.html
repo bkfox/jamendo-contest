@@ -1,0 +1,133 @@
+<html>
+    <head>
+        <meta charset="utf8">
+        <link rel="stylesheet" href="style.css">
+
+        <script src="config.js"></script>
+        <script src="jamendo_api_credentials.js"></script>
+        <script src="tracks.js"></script>
+        <script src="ui.js"></script>
+        <script src="datachannel.js"></script>
+        <script src="game.js"></script>
+        <script src="parasol.js"></script>
+
+        <title>PlasmaQuizz - Funny quizz for Jamendo</title>
+
+        <script>
+            function onload() {
+                config.load();
+                ui.init();
+                tracks.init();
+
+                // check url
+                if(location.hash.length > 1) {
+                    game.join(location.hash, 1);
+                }
+            }
+
+        </script>
+    </head>
+    <body onload="onload()">
+        <div id="time-count">
+          <div>
+            <p>10</p><p>9</p><p>8</p><p>7</p><p>6</p>
+            <p>5</p><p>4</p><p>3</p><p>2</p><p>1</p><p>0</p>
+          </div>
+        </div>
+
+        <div id="main-container">
+            <div id="index-panel" active="true">
+                <h1>PlasmaQuizz</h1>
+                <ol>
+                    <li>Click on the start button</li>
+                    <li>Allow Webcam and Microphone</li>
+                    <li>Share the URL</li>
+                    <li>Play!</li>
+                </ol>
+                <button onclick="game.join()" defaultFocus="true">Start a new game!</button>
+
+                <br><br><br>
+                <p align="center">You need a recent web browser, that supports Websockets and WebRTC (to play with challenges). You can use <a href="http://nightly.mozilla.org/">Firefox Nightly</a></p>
+            </div>
+
+            <div id="game-panel">
+                <div class="column">
+                    <div id="players"></div>
+                    <div id="ann" class="box toolbar">
+                        <div id="ann-panel">
+                            <div id="ann-start">
+                                Welcome to <b>PlasmaQuizz</b>! At each turn, the player with the lowest score must succeed a challenge. The others score him by giving him their own points (at least, 1 point). The game stops when someone die in real life.<br><br>
+                                When there is people, press that big button →
+                                <p style="float: right; font-size: 10pt;">
+                                    Move your mouse on the right to <b>configure</b> →
+                                </p>
+                                <button id="start-button">Start</button>
+                            </div>
+
+                            <div id="game">
+                                <audio id="challenge-track" controls></audio>
+                                <div id="game-top">
+                                    <h2>
+                                        Next challenge in 10 seconds!
+                                    </h2>
+                                    <div>
+                                        <h2 id="challenge"></h2>
+                                        <div id="reward-panel">
+                                            <div>
+                                                Give
+                                                <button id="reward-1" value="1">1 point</button>
+                                                <button id="reward-2" value="2">2 points</button>
+                                                <button id="reward-3" value="3">3 points</button>
+                                                <button id="reward-4" value="4">4 points</button>
+                                                <button id="reward-5" value="5">5 points</button>
+                                            </div>
+                                            <div id="reward"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="guess">
+                                    <div id="guess-off"></div>
+                                    <div>
+                                        Guess:
+                                        <input id="guess-entry" type="text" placeholder="artist (1 point), album (2 points), title (3 points)">
+                                        <button id="guess-cancel">I just want to know</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="options" class="expandable">
+                            <span class="label">&#9881;<span>Configuration</span></span>
+                            <div>
+                                Nickname: <input id="nickname" type="text" placeholder="nickname"><br><br>
+                                Music style you like: <input id="filter" type="text" placeholder="folk, rock...">
+                            </div>
+                        </div>
+                        <div id="lyrics-container" class="expandable">
+                            <span class="label">&#9835;<span>Lyrics</span></span>
+                            <div id="lyrics">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column box" id="chat-box">
+                    <div id="chat-content-container">
+                        <div id="chat-content"></div>
+                    </div>
+                    <div class="toolbar">
+                        <input type="text" id="chat-input" placeholder="say something!">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div style="display:none">
+            <div id="model-player" class="player">
+                <video class="box" autoplay="true" inherits="stream=src"></video>
+                <span class="name" inherits="name"></span> -
+                <span class="score" inherits="score">0</span> points
+            </div>
+        </div>
+    </body>
+</html>
