@@ -105,7 +105,7 @@ var ui = {
     if(config.nickname)   $('nickname').value = config.nickname;
     if(config.filter)     $('filter').value = config.filter || '';
 
-    $('challenge-track').volume = 0.7;
+    $('challenge-track').volume = 0.6;
 
 
     // widgets & events
