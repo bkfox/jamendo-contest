@@ -8,6 +8,19 @@ PlasmaQuizz is a video-chat web game, where players must complete challenges on 
 It encourage cooperation in the way that players give their own points to score the others, and help to discover a lot of artists from Jamendo.
 
 
+Screenshots
+-----------
+
+![Start page](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20stage%2000.png)
+
+![Page of the challenger](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20stage%2011.png)
+
+![Page of the non-challengers](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20stage%2020.png)
+
+![Details on lyrics](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20pad%20lyrics.png)
+
+![Details on configuration](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20pad%20configuration.png)
+
 Technical
 =========
 
