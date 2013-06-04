@@ -103,6 +103,7 @@ var game = {
     var o = { audio: true, video: true }
     function foo (stream) {
       ui.panel = 'game-panel';
+      $('options').setAttribute('blink', 'true');
 
       run.stream = stream;
       game._join(name);
@@ -129,6 +130,7 @@ var game = {
     else
       name = "plasmaquizz-" + DataChannel.prototype.uniqueToken();
     location.hash = '#' + name;
+    $('url-entry').value = location.toString();
 
     channel = new DataChannel(config.server, name);
 
