@@ -123,6 +123,9 @@ var ui = {
     });
 
     widgets.entry('chat-input', function(i, e) {
+      if(!i.value.length)
+        return;
+
       channel.broadcastString({ chat: i.value });
       ui.chat(channel.me, i.value);
       i.value = "";

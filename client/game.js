@@ -166,7 +166,7 @@ var game = {
           set nickname(v) { peer.ui.set('name', v); if(peer.me) game.sync(); },
           get score()     { return (peer.ui && parseInt(peer.ui.getAttribute('score'))); },
           set score(v)    { peer.ui.set('score', v); if(peer.me) game.sync(); },
-          color:          color(80, 250),
+          color:          color(80, 200),
         }
 
         if(peer.me) {
@@ -233,6 +233,7 @@ var game = {
     $('guess-off').innerHTML = "";
     $('ann-panel').off();
     $('challenge-track').pause();
+    $('time-count').removeAttribute('active');
 
     run = {
       stream: run.stream
@@ -271,7 +272,7 @@ var game = {
   /**
    *  Create a new challenge, and take the hand
    */
-  newChallenge: function(msg, peer) {
+  newChallenge: function() {
     var d = { challenge:  Math.floor(Math.random() * challenges.length),
               track:      tracks.pick() };
     var track = tracks.pick();
@@ -341,7 +342,7 @@ var game = {
 
     channel.broadcastString({ reward: run.totalReward });
     if(looser.me)
-      this.challenge();
+      this.newChallenge();
     else
       looser.sendString({ next: true });
     return true;
