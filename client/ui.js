@@ -145,21 +145,21 @@ var ui = {
     }, true);
 
 
-    $on('start-button', 'click', function() { game.start(); });
+    $on('start-button', 'click', function() { actions.start(); });
     $on('guess-cancel', 'click', function() { $('guess').off(); });
 
     for(var i = 1; i <= 5; i++) {
       $on('reward-' + i, 'click', function(e) {
-        game.doReward(parseInt(e.currentTarget.value));
+        actions.reward(parseInt(e.currentTarget.value));
       });
     }
 
 
     $on('challenge-track', 'click', function() {
       if($('challenge-track').paused)
-        game.gameSync({ play: $('challenge-track').currentTime });
+        channel.broadcastString({ play: $('challenge-track').currentTime });
       else
-        game.gameSync({ pause: true });
+        channel.broadcastString({ pause: true });
     });
   },
 

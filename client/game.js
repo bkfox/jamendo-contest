@@ -26,47 +26,18 @@ function defaultNick(id) {
  ******************************************************************************/
 var handlers = {
   onmessage: function (msg, channel, peer) {
-    console.log('got a message...');
+    console.log("> " + msg);
     message = msg;
     if(msg.substr)
       msg = JSON.parse(msg);
 
-    for(var i in msg) {
-      switch(i) {
-        case 'status':
-          for(var i in msg.status)
-            peer.data[i] = msg.status[i];
-          break;
-
-        // someone has a too long tong
-        case 'chat':
-          ui.chat(peer, msg.chat);
-          break;
-
-        // the game starts
-        case 'start':
-          game.start(peer);
-          break;
-
-        // i am the next one
-        case 'next':
-          game.newChallenge();
-          break;
-
-        // got a reward from someone
-        case 'reward':
-          game.reward(msg, peer);
-          break
-
-        case 'sync':
-          game.onGameSync(msg.sync, peer);
-      }
-    }
+    for(var i in msg)
+      if(on[i])
+        return on[i](msg, peer);
   },
 
 
   onstream: function (evt, peer) {
-    console.log('eyh! we ve got a stream');
     peer.ui.set('stream', URL.createObjectURL(evt.stream));
   },
 
@@ -88,14 +59,104 @@ var handlers = {
 
 
 
+var on = {
+  status: function(msg, peer) {
+    for(var i in msg.status)
+      peer.data[i] = msg.status[i];
+  },
+
+
+  chat: function(msg, peer) {
+    ui.chat(peer, msg.chat);
+  },
+
+
+  reward: function(msg, peer) {
+    if(run.current.me) {
+      // peer.data.score -= msg.reward; automatically done by the peer
+      peer.data.reward = msg.reward;
+      if(msg.reward) {
+        channel.me.data.score += msg.reward;
+        run.totalReward += msg.reward;
+        ui.notify('You got ' + msg.reward + ' points from ' + peer.data.nickname);
+      }
+      actions.checkDone();
+    }
+    else
+      ui.notify(peer.data.nickname + ' got a total of ' + msg.reward + ' points');
+  },
+
+
+  start: function(msg, peer) {
+    actions.start(peer);
+  },
+
+
+  next: function(msg, peer) {
+    actions.newChallenge();
+  },
+
+
+  challenge: function(msg, peer) {
+    run.track = msg.track;
+    run.challenge = challenges[msg.challenge];
+    run.current = peer;
+    run.totalReward = 0;
+
+    $('challenge-track').pause();
+    $('challenge-track').src = run.track.stream;
+    $('challenge-track').style.display = "none";
+    $('guess').off();
+    $('game-top').off();
+
+    if(peer == channel.me)
+      $('reward-panel').on();
+    else
+      $('reward-panel').off();
+
+    $('guess-entry').removeAttribute('wrong', 'true');
+    $('players').panel = null;
+
+    for(var i in channel.peers)
+      delete channel.peers[i].data.reward;
+  },
+
+
+  left: function(msg, peer) {
+    $('time-count').setAttribute('active', 'true');
+    $('time-count').innerHTML = msg.left;
+    window.setTimeout(function() {
+      $('time-count').removeAttribute('active');
+      if(msg.left == 0)
+        actions.startChallenge();
+    }, 500);
+  },
+
+
+  play: function(msg, peer) {
+    $('challenge-track').currentTime = msg.play;
+    $('challenge-track').play();
+    return;
+  },
+
+
+  pause: function(msg, peer) {
+    $('challenge-track').pause();
+    if(!peer.me)
+      ui.notify(peer.data.nickname + ' has paused the music');
+  },
+}
+
+
+
 /*******************************************************************************
- *  Game
+ *  actions
  ******************************************************************************/
-// Running game data
+// Running actions data
 var run = {};
 
-// Game interface
-var game = {
+// actions interface
+var actions = {
   join: function(name) {
     if(channel)
       channel.close();
@@ -106,11 +167,11 @@ var game = {
       $('options').setAttribute('blink', 'true');
 
       run.stream = stream;
-      game._join(name);
+      actions._join(name);
     }
 
     function err () {
-      game.reset(true);
+      actions.reset(true);
       ui.notify('Can\'t get media devices: did you accept it?');
     }
 
@@ -163,9 +224,9 @@ var game = {
 
         peer.data = {
           get nickname()  { return (peer.ui && peer.ui.getAttribute('name')); },
-          set nickname(v) { peer.ui.set('name', v); if(peer.me) game.sync(); },
+          set nickname(v) { peer.ui.set('name', v); if(peer.me) actions.sync(); },
           get score()     { return (peer.ui && parseInt(peer.ui.getAttribute('score'))); },
-          set score(v)    { peer.ui.set('score', v); if(peer.me) game.sync(); },
+          set score(v)    { peer.ui.set('score', v); if(peer.me) actions.sync(); },
           color:          color(80, 200),
         }
 
@@ -188,7 +249,7 @@ var game = {
 
     // bye peer
     channel.ondisconnect = function (peer, peers) {
-      ui.notify(peer.data.nickname + ' left the game');
+      ui.notify(peer.data.nickname + ' left the actions');
 
       if(peer.ui) {
         peer.ui.parentNode.removeChild(peer.ui);
@@ -196,19 +257,20 @@ var game = {
       }
 
       if(peer.me) {
-        game.reset(true);
+        actions.reset(true);
         return;
       }
 
       if(!Object.keys(channel.peers).length) {
-        game.reset(true);
+        actions.reset(true);
         return;
       }
 
       if(run.current.me)
-        game.checkDone();
+        actions.checkDone();
       else if(peer == run.current) {
         // TODO
+        actions.reset(true);
       }
     }
 
@@ -247,7 +309,7 @@ var game = {
       return;
 
     if(Object.keys(channel.peers).length == 0) {
-      alert('Dude, this game is made to be played with your friends.');
+      alert('Dude, this actions is made to be played with your friends.');
       return;
     }
 
@@ -262,11 +324,11 @@ var game = {
     for(var i in peers)
       peers[i].data.score = 10;
 
-    ui.notify(peer.data.nickname + " has started the game");
+    ui.notify(peer.data.nickname + " has started the actions");
     $('ann-panel').on();
 
     if(peer.me)
-      game.newChallenge();
+      actions.newChallenge();
   },
 
 
@@ -283,7 +345,22 @@ var game = {
       return;
     }
 
-    game.gameSync(d);
+    run.started = true;
+
+    // challenge send
+    channel.broadcastString({ challenge: d.challenge, track: d.track });
+
+    // timer
+    function foo(j) {
+      window.setTimeout(function() {
+        channel.broadcastString({ left: 10-j });
+        on.left({ left: 10-j }, channel.me);
+      }, j*1000);
+    }
+    for(var i = 0; i < 11; i++)
+      foo(i);
+
+    on.challenge({ challenge: d.challenge, track: d.track }, channel.me);
   },
 
 
@@ -328,7 +405,7 @@ var game = {
 
 
     $('challenge-track').play();
-    this.gameSync({ play: 0 });
+    channel.broadcastString({ play: 0 });
     $('players').panel = peer.ui;
   },
 
@@ -353,23 +430,7 @@ var game = {
   },
 
 
-  reward: function (msg, peer) {
-    if(run.current.me) {
-      // peer.data.score -= msg.reward; automatically done by the peer
-      peer.data.reward = msg.reward;
-      if(msg.reward) {
-        channel.me.data.score += msg.reward;
-        run.totalReward += msg.reward;
-        ui.notify('You got ' + msg.reward + ' points from ' + peer.data.nickname);
-      }
-      this.checkDone();
-    }
-    else
-      ui.notify(peer.data.nickname + ' got a total of ' + msg.reward + ' points');
-  },
-
-
-  doReward: function (note) {
+  reward: function (note) {
     $('reward-panel').on();
     $('reward').innerHTML = 'You rewarded ' + run.current.data.nickname + ' of ' + note;
 
@@ -380,90 +441,6 @@ var game = {
 
   sync: function () {
     channel.broadcastString({ status: channel.me.data });
-  },
-
-
-  gameSync: function(data) {
-    // run.peer == channel.me
-    if(data.challenge) {
-      run.started = true;
-      channel.broadcastString({ sync: { challenge: data.challenge, track: data.track }});
-
-      function foo(j) {
-        window.setTimeout(function() {
-          channel.broadcastString({ sync: { left: 10-j }});
-          game.onGameSync({ left: 10-j }, channel.me);
-        }, j*1000);
-      }
-      for(var i = 0; i < 11; i++)
-        foo(i);
-
-      game.onGameSync({ challenge: data.challenge, track: data.track }, channel.me);
-      return;
-    }
-
-    if(data.play != undefined)
-      channel.broadcastString({ sync: { play: data.play } });
-    if(data.pause)
-      channel.broadcastString({ sync: { pause: true } });
-  },
-
-
-  onGameSync: function(data, peer) {
-    if(data.challenge) {
-      run.track = data.track;
-      run.challenge = challenges[data.challenge];
-      run.current = peer;
-      run.totalReward = 0;
-
-      $('challenge-track').pause();
-      $('challenge-track').src = run.track.stream;
-      $('challenge-track').style.display = "none";
-      $('guess').off();
-      $('game-top').off();
-
-      if(peer == channel.me)
-        $('reward-panel').on();
-      else
-        $('reward-panel').off();
-
-      $('guess-entry').removeAttribute('wrong', 'true');
-      $('players').panel = null;
-
-      for(var i in channel.peers)
-        delete channel.peers[i].data.reward;
-
-      return;
-    }
-
-
-    if(data.left != undefined) {
-      $('time-count').setAttribute('active', 'true');
-      $('time-count').innerHTML = data.left;
-      window.setTimeout(function() {
-        $('time-count').removeAttribute('active');
-        if(data.left == 0)
-          game.startChallenge();
-      }, 500);
-    }
-
-    if(data.play != undefined) {
-      $('challenge-track').currentTime = data.play;
-      $('challenge-track').play();
-      return;
-    }
-
-    if(data.pause != undefined) {
-      $('challenge-track').pause();
-      if(!peer.me)
-        ui.notify(peer.data.nickname + ' has paused the music');
-    }
-
-    if(data.started != undefined) {
-      // i know kinda weird
-      peer.sendString({ reward: 0 });
-      $('ann-panel').panel = 'game-started';
-    }
   },
 }
 

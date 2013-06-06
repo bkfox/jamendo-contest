@@ -326,7 +326,10 @@ DataChannel.prototype.Peer.prototype = {
 
   //----------------------------------------------------------------------------
   send: function (data, channel) {
-    this.channels[channel || 'default' ].send(data);
+    try {
+      this.channels[channel || 'default' ].send(data);
+    }
+    catch(e) {}
   },
 
 

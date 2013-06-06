@@ -22,10 +22,20 @@ function uniqueToken() {
 function Channel(name) {
   this.name = name;
   this.peers = {};
+  this.time = Date.now();
   channels[name] = this;
 }
 
 Channel.prototype = {
+  check: function() {
+    if(Date.now() - this.time > 7200000) {
+      for(var i in this.peers)
+        this.peers.ws.close();
+      delete this.peers;
+      delete channels[this.name];
+    }
+  },
+
   addRef: function(p) {
     this.peers[p.id] = p;
   },
@@ -118,9 +128,21 @@ function Client(ws) {
 
 
 
+function seek() {
+  for(var i in channels)
+    channels[i].check();
+
+  setTimeout(seek, 60000);
+}
+
+
+console.log(config.port + ' ' + config.host);
+
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({ port: config.port,
                                 host: config.host });
+
+seek();
 
 wss.on('connection', function(ws) {
   try {
