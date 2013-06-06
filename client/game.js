@@ -234,6 +234,7 @@ var game = {
     $('ann-panel').off();
     $('challenge-track').pause();
     $('time-count').removeAttribute('active');
+    $('lyrics-container').style.display = 'none';
 
     run = {
       stream: run.stream
@@ -273,6 +274,7 @@ var game = {
    *  Create a new challenge, and take the hand
    */
   newChallenge: function() {
+    console.log('start a new challenge');
     var d = { challenge:  Math.floor(Math.random() * challenges.length),
               track:      tracks.pick() };
     var track = tracks.pick();
@@ -326,6 +328,7 @@ var game = {
 
 
     $('challenge-track').play();
+    this.gameSync({ play: 0 });
     $('players').panel = peer.ui;
   },
 
@@ -340,6 +343,7 @@ var game = {
         looser = channel.peers[i];
     }
 
+    console.log(looser.me + ' is the looser...');
     channel.broadcastString({ reward: run.totalReward });
     if(looser.me)
       this.newChallenge();
@@ -451,7 +455,7 @@ var game = {
 
     if(data.pause != undefined) {
       $('challenge-track').pause();
-      if(peer != channel.me)
+      if(!peer.me)
         ui.notify(peer.data.nickname + ' has paused the music');
     }
 

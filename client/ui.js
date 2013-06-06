@@ -155,12 +155,11 @@ var ui = {
     }
 
 
-    $on('challenge-track', 'play', function() {
-      game.gameSync({ play: $('challenge-track').currentTime });
-    });
-
-    $on('challenge-track', 'pause', function() {
-      game.gameSync({ pause: true });
+    $on('challenge-track', 'click', function() {
+      if($('challenge-track').paused)
+        game.gameSync({ play: $('challenge-track').currentTime });
+      else
+        game.gameSync({ pause: true });
     });
   },
 
