@@ -46,7 +46,7 @@ For statics files that can be served as usual, the directory is ./client
 
 Configuration
 -------------
-The configuration is done through different files: server/config , client/config, and client/jamendo_api_credentials.js; This last file must have the following syntax:
+The configuration is done through different files: server/config.js, client/config.js, and client/jamendo_api_credentials.js; This last file must have the following syntax:
 
 ```javascript
 config.jamendoID = "";          // your jamendo api identifier
