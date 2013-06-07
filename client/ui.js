@@ -126,7 +126,7 @@ var ui = {
       if(!i.value.length)
         return;
 
-      channel.broadcastString({ chat: i.value });
+      channel.broadcastAsString({ chat: i.value });
       ui.chat(channel.me, i.value);
       i.value = "";
     }, true);
@@ -145,7 +145,7 @@ var ui = {
     }, true);
 
 
-    $on('start-button', 'click', function() { actions.start(); });
+    $on('start-button', 'click', function() { if(channel.ready) actions.start(); });
     $on('guess-cancel', 'click', function() { $('guess').off(); });
 
     for(var i = 1; i <= 5; i++) {
@@ -157,10 +157,10 @@ var ui = {
 
     $on('challenge-track', 'click', function() {
       if($('challenge-track').paused)
-        channel.broadcastString({ play: $('challenge-track').currentTime });
+        channel.broadcastAsString({ play: $('challenge-track').currentTime });
       else
-        channel.broadcastString({ pause: true });
-    });
+        channel.broadcastAsString({ pause: true });
+    }, true);
   },
 
 

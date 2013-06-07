@@ -28,14 +28,18 @@ function DataChannel(server, name) {
 
 DataChannel.prototype = {
   //----------------------------------------------------------------------------
-  _addPeer: function(id, data) {
+  _addPeer: function(id, data, offerer) {
     console.log(id + ' ' + this.peers[id]);
     if(this.peers[id])
       return;
 
     var p = new this.Peer(this, id, data);
+    var o = this.onpeer(p, offerer);
+    if(!o)
+      return this.announce({ refuse: true, to: m.from });
+
     this.peers[id] = p;
-    this.onpeer(p);
+    p._setStreams(o);
   },
 
 
@@ -54,13 +58,14 @@ DataChannel.prototype = {
 
     if(m.connected) {
       // i am connected -- yessss!
+      this.position = m.peers.length;
       this.me = new this.Peer(this, m.id, -1);
       this.me.data = this.onconnect(m);
       this.onpeer(this.me);
 
-      for(var i in m.peers)
-        if(m.peers[i] != m.id)
-          this._addPeer(m.peers[i]);
+      // last one is always me
+      for(var i = 0; i < m.peers.length-1; i++)
+        this._addPeer(m.peers[i], null, true);
     }
 
 
@@ -74,12 +79,8 @@ DataChannel.prototype = {
       from = this.peers[m.from];
       if(from)
         from._set(m);
-      else {
-        var r = this.onpeerrequest(m);
-        if(!r)
-          return this.announce({ refuse: true, to: m.from });
+      else
         this._addPeer(m.from, m);
-      }
       return;
     }
   },
@@ -98,12 +99,7 @@ DataChannel.prototype = {
 
     ws.onmessage = function(evt) {
       console.log(evt.data);
-      try {
         dc._onannounce(JSON.parse(evt.data));
-      }
-      catch(e) {
-        console.log('ws.onmessage:' + e);
-      }
     };
 
     ws.onclose = function(evt) {
@@ -148,13 +144,31 @@ DataChannel.prototype = {
    *  Broadcast a message as a string. If it is not a string,
    *  use JSON.stringify;
    */
-  broadcastString: function(data) {
+  broadcastAsString: function(data) {
+    if(!data.substr)
+      data = JSON.stringify(data);
+
     for(var i in this.peers)
       if(this.me != this.peers[i])
-        this.peers[i].sendString(data);
+        this.peers[i].send(data);
   },
 
 
+
+  get ready() {
+    for(var i in this.peers)
+      if(!this.peers[i].ready)
+        return false;
+    return true;
+  },
+
+
+  get count() {
+    if(!this.me)
+      return 0;
+
+    return Object.keys(this.peers).length + 1;
+  },
 
   //----------------------------------------------------------------------------
   uniqueToken: function() {
@@ -171,26 +185,20 @@ DataChannel.prototype = {
   onconnect: function(message) { throw "unimplemented"; },
 
   /**
-   *  A peer request to connect
-   *  return: true if request is accepeted
-   */
-  onpeerrequest: function (data) { throw "unimplemented"; },
-
-  /**
-   *  Called at creation of the peer, use it to add streams
-   */
-  onpeercreation: function (peer) { throw "unimplemented"; },
-
-  /**
    *  A peer is connected, or DataChannel.me has been created;
-   *  Note: at this stage, the WebRTC negociation is not finished, so you
-   *  should wait for the "default" datachannel to be opened on the Peer's
-   *  connection before opening any stream;
+   *
+   *  When peer is not me:
+   *    If nothing is returned by this function, it refuse peer's connection
+   *    Otherwise, an object with:
+   *        {
+   *          streams:      Array of string (for channel) or streams,
+   *          incoming:     Number of expected incoming streams/channels
+   *        }
    */
-  onpeer: function (peer) { throw "unimplemented"; },
+  onpeer: function (peer, offerer) { throw "unimplemented"; },
 
   /**
-   *  Peer has been disconnected.
+   *  A peer has been disconnected.
    *  If peer == me, then peers is a list of all peers;
    */
   ondisconnect: function (peer, peers) { throw "unimplemented"; },
@@ -217,84 +225,88 @@ DataChannel.prototype.Peer = function(dc, id, data) {
   this.id = id;
   this.me = (data == -1);
   this.dc = dc;
-
-  if(this.me)
-    return;
-
-  var p = this;
-  var pc = new RTC.peerConnection(null);
-
-  this.pc = pc;
-  this.channels = {}
-
-
-  // events
-  pc.onicecandidate = function (evt) {
-    if(evt.candidate)
-      dc.announce({ candidate: evt.candidate, data: dc.me.data, to: p.id });
-  }
-
-  pc.onaddstream = function (evt) {
-    console.log('got a stream');
-    p.onstream(evt, p);
-  }
-
-  pc.onremovestream = function (evt) {
-    p.onremovestream(evt, p);
-  }
-
-  pc.ondatachannel = function (evt) {
-    p._initDC(evt.channel, true);
-  }
-
-
-  // connection offer/answer - localdescription
-  function gd(desc) {
-    pc.setLocalDescription(desc);
-    dc.announce({ sdp: desc, data: dc.me.data, to: p.id });
-  }
-
-  function err(e) {
-    var t = 'Error with RTC createOffer OR createAnswer; Error informations:';
-    for(var i in e)
-      t += '\n\t' + i + ' = ' + e[i];
-    console.log(t);
-  }
-
-
-  var dcc;
-  if(data)
-    // if we got rtc data
-    this._set(data);
-  else {
-    // we are an offerer: create a default channel
-    // the given data are our
-    dcc = pc.createDataChannel('default');
-    this._initDC(dcc);
-  }
-
-  dc.onpeercreation(this);
-
-  // don't need it anymore
-  delete this.addStream;
-  delete this.addDataChannel;
-
-  if(data)
-    pc.createAnswer(gd, err);
-  else
-    pc.createOffer(gd, err);
+  this._data = data;
 }
 
 
 DataChannel.prototype.Peer.prototype = {
-  //----------------------------------------------------------------------------
-  _initDC: function(channel, isIn) {
+  _setStreams: function(streams) {
+    if(this.me || this.channels)
+      return;
+
     var p = this;
-    channel.onmessage = function (evt) {
-      p.onmessage(evt.data, channel, p);
+    var dc = this.dc;
+    var data = this._data;
+
+    var pc = new RTC.peerConnection(null);
+    this.pc = pc;
+    this.channels = {}
+
+
+    // events
+    pc.onicecandidate = function (evt) {
+      if(evt.candidate)
+        dc.announce({ candidate: evt.candidate, data: dc.me.data, to: p.id });
     }
 
-    channel.onerror = function (evt) { }
+    pc.onaddstream = function (evt) {
+      p.onstream(evt, p);
+      p._credit();
+    }
+
+    pc.onremovestream = function (evt) {
+      p.onremovestream(evt, p);
+    }
+
+    pc.ondatachannel = function (evt) {
+      p._initDC(evt.channel, true);
+    }
+
+
+    // connection offer/answer - localdescription
+    function gd(desc) {
+      pc.setLocalDescription(desc);
+      dc.announce({ sdp: desc, data: dc.me.data, to: p.id });
+    }
+
+    function err(e) {
+      var t = 'Error with RTC createOffer OR createAnswer; Error informations:';
+      for(var i in e)
+        t += '\n\t' + i + ' = ' + e[i];
+      console.log(t);
+    }
+
+    var dcc;
+    if(data)
+      // if we got rtc data
+      this._set(data);
+
+    // streams
+    this._loading = streams.streams.length + streams.incoming;
+    console.log(this._loading);
+
+    streams = streams.streams;
+    for(var i = 0; i < streams.length; i++)
+      if(streams[i].substr)
+        this._initDC(pc.createDataChannel(streams[i]));
+      else {
+        pc.addStream(streams[i]);
+        this._loading--;
+      }
+
+    if(data)
+      pc.createAnswer(gd, err);
+    else
+      pc.createOffer(gd, err);
+
+    delete this._data;
+  },
+
+
+  _initDC: function(channel, isIn) {
+    var p = this;
+    channel.onmessage = function (evt) { p.onmessage(evt.data, channel, p); }
+    channel.onerror = function (evt) { p.onerror(evt, p); }
     channel.onclose = function (evt) {
       delete p.channels[channel.label];
       p.onremovedatachannel(channel, p);
@@ -303,6 +315,21 @@ DataChannel.prototype.Peer.prototype = {
     channel.onopen = function (evt) {
       p.channels[channel.label] = channel;
       p.ondatachannel(channel, p);
+      p._credit();
+    }
+  },
+
+
+  _credit: function() {
+    if(this._loading == undefined)
+      return;
+
+    console.log('credit');
+    this._loading--;
+    if(!this._loading) {
+      delete this._loading;
+      this.ready = true;
+      this.onready(this);
     }
   },
 
@@ -318,7 +345,7 @@ DataChannel.prototype.Peer.prototype = {
 
     if(data.sdp)
       this.pc.setRemoteDescription(new RTC.sessionDescription(data.sdp));
-    else
+    else if(data.candidate)
       this.pc.addIceCandidate(new RTC.iceCandidate(data.candidate));
   },
 
@@ -333,20 +360,10 @@ DataChannel.prototype.Peer.prototype = {
   },
 
 
-  sendString: function (data, channel) {
+  sendAsString: function (data, channel) {
     if(!data.substr)
       data = JSON.stringify(data);
     this.send(data, channel);
-  },
-
-
-  addStream: function (stream) {
-    console.log('Add Stream');
-    if(stream.splice)
-      for(var i = 0; i < stream.length; i++)
-        this.pc.addStream(stream[i]);
-    else
-      this.pc.addStream(stream);
   },
 
 
@@ -356,15 +373,6 @@ DataChannel.prototype.Peer.prototype = {
         this.pc.removeStream(stream[i]);
     else
       this.pc.removeStream(stream);
-  },
-
-
-  addDataChannel: function (name) {
-    if(name.splice)
-      for(var i = 0; i < name.length; i++)
-        this.pc.createDataChannel(name[i]);
-    else
-      this.pc.createDataChannel(name);
   },
 
 
@@ -388,26 +396,12 @@ DataChannel.prototype.Peer.prototype = {
    *
    */
   onmessage: function(msg, me) { throw "unimplemented"; },
-
-  /**
-   *
-   */
-  onstream: function(evt, me) { throw "unimplemented"; },
-
-  /**
-   *
-   */
-  onremovestream: function(evt, me) { throw "unimplemented"; },
-
-  /**
-   *
-   */
-  ondatachannel: function(evt, me) { throw "unimplemented"; },
-
-  /**
-   *
-   */
-  onremovedatachannel: function(evt, me) { throw "unimplemented"; },
+  onstream: function(evt, me) {},
+  onremovestream: function(evt, me) {},
+  ondatachannel: function(channel, me) {},
+  onremovedatachannel: function(evt, me) {},
+  onerror: function(evt, me) {},
+  onready: function(me) {},
 }
 
 

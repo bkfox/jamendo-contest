@@ -42,18 +42,9 @@ var handlers = {
   },
 
 
-  onremovestream: function (evt) {
-  },
-
-
-  ondatachannel: function (channel, peer) {
-    if(channel.label == 'default' && !peer.me)
-      peer.addStream(run.stream);
-  },
-
-
-  onremovedatachannel: function (channel) {
-    console.log('channel removed: ' + channel.label);
+  onready: function (evt, peer) {
+    if(channel.ready)
+      $('start-button').removeAttribute('disabled');
   },
 }
 
@@ -164,6 +155,7 @@ var actions = {
     var o = { audio: true, video: true }
     function foo (stream) {
       ui.panel = 'game-panel';
+      $('start-button').setAttribute('disabled', 'true');
       $('options').setAttribute('blink', 'true');
 
       run.stream = stream;
@@ -204,18 +196,15 @@ var actions = {
       return { nickname: config.nickname, score: 10 };
     }
 
-    // hey, you wanna come?
-    channel.onpeerrequest = function (m) {
-      return Object.keys(channel.peers).length < 3 && !run.started;
-    }
 
     // hello peer
-    channel.onpeer = function (peer) {
+    channel.onpeer = function (peer, offerer) {
+      if(channel.count > 3 || run.started)
+        return;
+
       peer.onmessage =  handlers.onmessage;
       peer.onstream = handlers.onstream;
-      peer.onremovestream = handlers.onremovestream;
-      peer.ondatachannel = handlers.ondatachannel;
-      peer.onremovedatachannel = handlers.onremovedatachannel;
+      peer.onready = handlers.onready;
 
       if(!peer.ui) {
         peer.ui = widgets.player();
@@ -240,12 +229,15 @@ var actions = {
       }
 
       ui.notify(peer.data.nickname + ' is connected');
+
+      $('start-button').setAttribute('disabled', 'true');
+
+      if(offerer)
+        return { streams: [run.stream, "default"], incoming: 1 };
+      else
+        return { streams: [run.stream], incoming: 2 };
     }
 
-
-    channel.onpeercreation = function (peer) {
-      peer.addStream(run.stream);
-    }
 
     // bye peer
     channel.ondisconnect = function (peer, peers) {
@@ -297,6 +289,7 @@ var actions = {
     $('challenge-track').pause();
     $('time-count').removeAttribute('active');
     $('lyrics-container').style.display = 'none';
+    $('start-button').setAttribute('disabled');
 
     run = {
       stream: run.stream
@@ -316,7 +309,7 @@ var actions = {
     run.started = true;
 
     if(!peer) {
-      channel.broadcastString({ start: true });
+      channel.broadcastAsString({ start: true });
       peer = channel.me;
     }
 
@@ -348,12 +341,12 @@ var actions = {
     run.started = true;
 
     // challenge send
-    channel.broadcastString({ challenge: d.challenge, track: d.track });
+    channel.broadcastAsString({ challenge: d.challenge, track: d.track });
 
     // timer
     function foo(j) {
       window.setTimeout(function() {
-        channel.broadcastString({ left: 10-j });
+        channel.broadcastAsString({ left: 10-j });
         on.left({ left: 10-j }, channel.me);
       }, j*1000);
     }
@@ -405,7 +398,7 @@ var actions = {
 
 
     $('challenge-track').play();
-    channel.broadcastString({ play: 0 });
+    channel.broadcastAsString({ play: 0 });
     $('players').panel = peer.ui;
   },
 
@@ -421,11 +414,11 @@ var actions = {
     }
 
     console.log(looser.me + ' is the looser...');
-    channel.broadcastString({ reward: run.totalReward });
+    channel.broadcastAsString({ reward: run.totalReward });
     if(looser.me)
       this.newChallenge();
     else
-      looser.sendString({ next: true });
+      looser.sendAsString({ next: true });
     return true;
   },
 
@@ -435,12 +428,12 @@ var actions = {
     $('reward').innerHTML = 'You rewarded ' + run.current.data.nickname + ' of ' + note;
 
     channel.me.data.score -= note;
-    run.current.sendString({ reward: note });
+    run.current.sendAsString({ reward: note });
   },
 
 
   sync: function () {
-    channel.broadcastString({ status: channel.me.data });
+    channel.broadcastAsString({ status: channel.me.data });
   },
 }
 
