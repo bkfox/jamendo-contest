@@ -180,7 +180,7 @@ var run = {};
 var actions = {
   join: function(name, public) {
     if(channel)
-      channel.close();
+      channel.disconnect();
 
     var o = { audio: true, video: true }
     function foo (stream) {
@@ -226,7 +226,8 @@ var actions = {
       if(!config.nickname)
         config.nickname = defaultNick(m.id);
 
-      channel.announce({ public: true });
+      if(m.peers.length == 1)
+        channel.announce({ public: true });
 
       return { nickname: config.nickname, score: 10 };
     }
@@ -301,6 +302,11 @@ var actions = {
         actions.reset(true);
         ui.notify('The challenging guy has disappeared... The matrix want a revanche, but in another game');
       }
+    }
+
+
+    channel.onrefuse = function (peer) {
+      channel.disconnect();
     }
 
     // connect

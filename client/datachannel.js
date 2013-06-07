@@ -66,6 +66,7 @@ DataChannel.prototype = {
 
 
     if(m.refuse) {
+      this.onrefuse(this.peers[m.from]);
       delete this.peers[m.from];
       return;
     }

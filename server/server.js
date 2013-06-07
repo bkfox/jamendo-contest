@@ -31,7 +31,10 @@ Channel.prototype = {
     if(Date.now() - this.time > 7200000) {
       for(var i in this.peers)
         if(this.peers[i].ws)
-          this.peers[i].ws.close();
+          try {
+            this.peers[i].ws.close();
+          }
+          catch(e) {}
       delete this.peers;
       delete channels[this.name];
     }
@@ -145,7 +148,9 @@ function Client(ws) {
 
 function seek() {
   for(var i in channels)
-    channels[i].check();
+    try {
+      channels[i].check();
+    } catch(e) {}
 
   setTimeout(seek, 60000);
 }
