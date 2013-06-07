@@ -79,7 +79,6 @@ var on = {
 
 
   start: function(msg, peer) {
-    run.started = true;
     actions.start(peer);
   },
 
@@ -210,7 +209,7 @@ var actions = {
       if(!peer.ui) {
         peer.ui = widgets.player();
         peer.ui.set('name', (peer.data && peer.data.nickname) || defaultNick(peer.id) )
-               .set('score', (peer.data && peer.data.score) || 0);
+               .set('score', (peer.data && peer.data.score) || 10);
 
         peer.data = {
           get nickname()  { return (peer.ui && peer.ui.getAttribute('name')); },
@@ -251,19 +250,21 @@ var actions = {
 
       if(peer.me) {
         actions.reset(true);
+        ui.notify('You have been disconnected from the server');
         return;
       }
 
       if(!Object.keys(channel.peers).length) {
         actions.reset(true);
+        ui.notify('There is no more people in the room');
         return;
       }
 
       if(run.current.me)
         actions.checkDone();
       else if(peer == run.current) {
-        // TODO
         actions.reset(true);
+        ui.notify('The challenging guy has disappeared... The matrix want a revanche, but in another game');
       }
     }
 
@@ -316,11 +317,7 @@ var actions = {
       peer = channel.me;
     }
 
-    peers = channel.peers;
-    for(var i in peers)
-      peers[i].data.score = 10;
-
-    ui.notify(peer.data.nickname + " has started the actions");
+    ui.notify(peer.data.nickname + " has started the game");
     $('ann-panel').on();
 
     if(peer.me)
