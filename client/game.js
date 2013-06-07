@@ -9,7 +9,7 @@ var challenges = [
   ' must DANSE on the music <small>(follow him in his gigue)</small>',
   ' must DANSE ALONE on the music <small>(point the finger to him)</small>',
   ' must PLAYBACK on the music',
-  ' must DO WHATEVER you want',
+  ' must DO WHATEVER he wants',
   ' must RICKROLL... &#9835; Yeah... &#9833; Yeah... &#9836;'
 ]
 
