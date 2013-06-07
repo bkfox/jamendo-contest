@@ -29,14 +29,13 @@ function DataChannel(server, name) {
 DataChannel.prototype = {
   //----------------------------------------------------------------------------
   _addPeer: function(id, data, offerer) {
-    console.log(id + ' ' + this.peers[id]);
     if(this.peers[id])
       return;
 
     var p = new this.Peer(this, id, data);
     var o = this.onpeer(p, offerer);
     if(!o)
-      return this.announce({ refuse: true, to: m.from });
+      return this.announce({ refuse: true, to: id });
 
     this.peers[id] = p;
     p._setStreams(o);
@@ -99,7 +98,7 @@ DataChannel.prototype = {
 
     ws.onmessage = function(evt) {
       console.log(evt.data);
-        dc._onannounce(JSON.parse(evt.data));
+      dc._onannounce(JSON.parse(evt.data));
     };
 
     ws.onclose = function(evt) {
@@ -283,7 +282,6 @@ DataChannel.prototype.Peer.prototype = {
 
     // streams
     this._loading = streams.streams.length + streams.incoming;
-    console.log(this._loading);
 
     streams = streams.streams;
     for(var i = 0; i < streams.length; i++)
@@ -324,7 +322,6 @@ DataChannel.prototype.Peer.prototype = {
     if(this._loading == undefined)
       return;
 
-    console.log('credit');
     this._loading--;
     if(!this._loading) {
       delete this._loading;

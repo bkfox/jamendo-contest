@@ -79,6 +79,7 @@ var on = {
 
 
   start: function(msg, peer) {
+    run.started = true;
     actions.start(peer);
   },
 
@@ -118,7 +119,7 @@ var on = {
     $('time-count').innerHTML = msg.left;
     window.setTimeout(function() {
       $('time-count').removeAttribute('active');
-      if(msg.left == 0)
+      if(msg.left == 0 && run.current)
         actions.startChallenge();
     }, 500);
   },
@@ -289,7 +290,7 @@ var actions = {
     $('challenge-track').pause();
     $('time-count').removeAttribute('active');
     $('lyrics-container').style.display = 'none';
-    $('start-button').setAttribute('disabled');
+    $('start-button').setAttribute('disabled', 'true');
 
     run = {
       stream: run.stream
@@ -338,7 +339,6 @@ var actions = {
       return;
     }
 
-    run.started = true;
 
     // challenge send
     channel.broadcastAsString({ challenge: d.challenge, track: d.track });
@@ -388,6 +388,7 @@ var actions = {
     if(!peer.me)
       $('guess').on();
 
+    $('reward').innerHTML = "";
     $('guess-off').innerHTML =
       '<a href="http://www.jamendo.com/track/' + track.id + '">' +
       track.name + '</a>, by <a href="http://www.jamendo.com/artist/' +

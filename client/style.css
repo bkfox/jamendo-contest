@@ -358,7 +358,10 @@ input[type="text"]:focus {
 
 .expandable > div {
   display: none;
-  width: 100%;
+  width: padding(100% - 2em);
+  margin: 0.5em 0em 0.5em 2em;
+  height: calc(100% - 1em);
+  overflow: auto;
 }
 
 .expandable:hover > div {
@@ -370,15 +373,16 @@ input[type="text"]:focus {
   font-size: 14pt;
   font-weight: bold;
   display: block;
-  width: 100%;
+  width: 1em;
   margin-bottom: 5px;
+  float: left;
+  text-align: center;
 }
 
 .expandable .label span {
-  margin-left:10px;
-  border-bottom: 1px white solid;
-  width: 90%;
-  font-size: 12pt;
+  display: block;
+  font-size: 10pt;
+  margin-top: 10px;
 }
 
 .expandable input {

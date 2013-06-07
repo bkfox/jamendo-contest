@@ -33,16 +33,17 @@
         <div id="main-container">
             <div id="index-panel" active="true">
                 <h1>PlasmaQuizz</h1>
+                <h2>Play musical challenges with your friends, through video-chat!</h2>
                 <ol>
                     <li>Click on the start button</li>
                     <li>Allow Webcam and Microphone</li>
-                    <li>Share the URL</li>
+                    <li>Share the URL with your friends</li>
                     <li>Play!</li>
                 </ol>
-                <button onclick="actions.join()" defaultFocus="true">Start a new game!</button>
+                <button onclick="actions.join()" defaultFocus="true">Create a new game!</button>
 
                 <br><br><br>
-                <p align="center">You need a recent web browser, that supports Websockets and WebRTC. You can use <a href="http://nightly.mozilla.org/">Firefox Nightly</a></p>
+                <p align="center">You need a recent web browser, that supports WebRTC. You can use <a href="http://nightly.mozilla.org/">Firefox Nightly</a>. This technology is under development, so it can be unstable</p>
             </div>
 
             <div id="game-panel">
@@ -51,7 +52,7 @@
                     <div id="ann" class="box toolbar">
                         <div id="ann-panel">
                             <div id="ann-start">
-                                <p>Welcome to <b>PlasmaQuizz</b>! At each turn, the player with the lowest score must succeed a challenge. The others score him by giving him their own points (at least, 1 point). The game stops when someone dies in real life.</p>
+                                <p>At each turn, the player with the lowest score must succeed a challenge. The others score him by giving him their own points (at least, 1 point). The game stops when someone dies in real life.</p>
                                 <p>Share this link: <input id="url-entry" type="text"></p>
                                 <p align="center"><button id="start-button">Start</button></p>
                             </div>
@@ -93,14 +94,19 @@
                         </div>
 
                         <div id="options" class="expandable">
-                            <span class="label">&#9881;<span>Configuration</span></span>
+                            <span class="label">
+                                &#9881;
+                                <span>
+                                    S<br>e<br>t<br>t<br>i<br>n<br>g<br>s
+                                </span>
+                            </span>
                             <div>
                                 Nickname: <input id="nickname" type="text" placeholder="nickname"><br><br>
                                 Music style you like: <input id="filter" type="text" placeholder="folk, rock...">
                             </div>
                         </div>
                         <div id="lyrics-container" class="expandable">
-                            <span class="label">&#9835;<span>Lyrics</span></span>
+                            <span class="label">&#9835;<span>L<br>y<br>r<br>i<br>c<br>s</span></span>
                             <div id="lyrics">
                             </div>
                         </div>
