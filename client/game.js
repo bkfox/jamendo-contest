@@ -208,18 +208,16 @@ var actions = {
 
 
   _join: function(name, public) {
-    if(name)
-      name = name.replace(/(\?|#|\/|\s)/gi, '');
-    else {
+    if(!name) {
       if($('room-name-entry').value.length)
         name = $('room-name-entry').value;
       else
         name = "plasmaquizz-" + DataChannel.prototype.uniqueToken();
     }
 
-    location.hash = '#' + name;
     $('url-entry').value = location.toString();
 
+    location.hash = '#' + name;
     channel = new DataChannel(config.server, name);
 
     // i am on the place!

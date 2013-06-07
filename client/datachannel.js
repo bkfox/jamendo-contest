@@ -17,9 +17,6 @@ RTC.moz = !! window.mozRTCPeerConnection;
  *  DataChannel
  ******************************************************************************/
 function DataChannel(server, name) {
-  if(name)
-    name = name.replace(/(\?|#|\/|\s)/gi, '');
-
   this.server = server;
   this.name = name;
   this.peers = {};

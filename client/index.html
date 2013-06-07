@@ -21,7 +21,7 @@
 
                 // check url
                 if(location.hash.length > 1) {
-                    actions.join(location.hash, 1);
+                    actions.join(location.hash.substr(1), 1);
                 }
                 else
                   publicRooms();
