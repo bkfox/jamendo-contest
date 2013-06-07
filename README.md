@@ -18,6 +18,9 @@ You can try a demonstration here: http://plasmaquizz.lordblackfox.net/
 Screenshots
 -----------
 
+(The screenshots are not up to date, few graphical changes have been done since)
+
+
 ![Start page](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20stage%2000.png)
 
 ![Page of the challenger](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20stage%2011.png)
