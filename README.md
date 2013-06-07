@@ -22,11 +22,11 @@ Screenshots
 
 ![Index](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/index.png)
 
-![Waiting for players](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20stage%2000.png)
+![Waiting for players](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/stage0.png)
 
-![Page of the challenger](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20stage%2011.png)
+![Page of the challenger](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/stage1.png)
 
-![Page of the non-challengers](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20stage%2020.png)
+![Page of the non-challengers](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/stage2.png)
 
 ![Details on lyrics](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/lyrics.png)
 
@@ -54,5 +54,8 @@ config.jamendoID = "";          // your jamendo api identifier
 config.jamendoSecret = "";      // your jamendo client's secret (not really needed)
 ```
 
+Thanks
+======
 
+Thanks to Piks3l, Link Mauve, and Sonny for their long distance help;
 
