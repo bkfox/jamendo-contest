@@ -20,16 +20,17 @@ Screenshots
 
 (The screenshots are not up to date, few graphical changes have been done since)
 
+![Index](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/index.png)
 
-![Start page](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20stage%2000.png)
+![Waiting for players](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20stage%2000.png)
 
 ![Page of the challenger](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20stage%2011.png)
 
 ![Page of the non-challengers](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20stage%2020.png)
 
-![Details on lyrics](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20pad%20lyrics.png)
+![Details on lyrics](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/lyrics.png)
 
-![Details on configuration](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/2013-06-03%20-%20pad%20configuration.png)
+![Details on configuration](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/configuration.png)
 
 Technical
 =========
