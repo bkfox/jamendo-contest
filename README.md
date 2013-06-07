@@ -18,7 +18,7 @@ You can try a demonstration here: http://plasmaquizz.lordblackfox.net/
 Screenshots
 -----------
 
-(The screenshots are not up to date, few graphical changes have been done since)
+(Some screenshots are not up to date, few graphical changes have been done since)
 
 ![Index](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/index.png)
 
