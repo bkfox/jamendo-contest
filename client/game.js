@@ -285,7 +285,6 @@ var actions = {
       $('players').innerHTML = "";
     }
 
-
     $('players').panel = null;
     $('chat-content').innerHTML = "";
     $('guess-off').innerHTML = "";
