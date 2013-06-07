@@ -21,6 +21,36 @@ function defaultNick(id) {
 
 
 
+function publicRooms() {
+  var ws = new WebSocket(config.server);
+
+  $('rooms').innerHTML = '<p align="center">loading from server...</p>';
+
+  ws.onopen = function() {
+    ws.send('{"list":true}');
+  }
+
+  ws.onmessage = function(evt) {
+    var d = JSON.parse(evt.data).list;
+    if(!d || !d.length) {
+      $('rooms').innerHTML = '<p align="center">no room</p>';
+      return;
+    }
+
+    $('rooms').innerHTML = '';
+
+    for(var i = 0; i < d.length; i++) {
+      var e = document.createElement('div');
+      e.innerHTML = d[i];
+      $on(e, 'click', function(evt) { actions.join(evt.currentTarget.innerHTML) });
+      $('rooms').appendChild(e);
+    }
+  }
+}
+
+
+
+
 /*******************************************************************************
  *  Handlers & players
  ******************************************************************************/
@@ -148,7 +178,7 @@ var run = {};
 
 // actions interface
 var actions = {
-  join: function(name) {
+  join: function(name, public) {
     if(channel)
       channel.close();
 
@@ -159,7 +189,7 @@ var actions = {
       $('options').setAttribute('blink', 'true');
 
       run.stream = stream;
-      actions._join(name);
+      actions._join(name, public);
     }
 
     function err () {
@@ -177,11 +207,16 @@ var actions = {
   },
 
 
-  _join: function(name) {
+  _join: function(name, public) {
     if(name)
       name = name.replace(/(\?|#|\/|\s)/gi, '');
-    else
-      name = "plasmaquizz-" + DataChannel.prototype.uniqueToken();
+    else {
+      if($('room-name-entry').value.length)
+        name = $('room-name-entry').value;
+      else
+        name = "plasmaquizz-" + DataChannel.prototype.uniqueToken();
+    }
+
     location.hash = '#' + name;
     $('url-entry').value = location.toString();
 
@@ -192,6 +227,8 @@ var actions = {
       ui.notify('Connected to the room, waiting for friends...');
       if(!config.nickname)
         config.nickname = defaultNick(m.id);
+
+      channel.announce({ public: true });
 
       return { nickname: config.nickname, score: 10 };
     }
@@ -249,7 +286,7 @@ var actions = {
       }
 
       if(peer.me) {
-        actions.reset(true);
+        actions.reset();
         ui.notify('You have been disconnected from the server');
         return;
       }
@@ -275,7 +312,8 @@ var actions = {
 
   reset: function(stay) {
     if(!stay) {
-        ui.panel = 'index-panel';
+      ui.panel = 'index-panel';
+      publicRooms();
 
       if(channel) {
         channel.close()
@@ -283,7 +321,11 @@ var actions = {
       }
 
       $('players').innerHTML = "";
+      location.hash = '';
     }
+    else
+      channel.announce({ public: true });
+
 
     $('players').panel = null;
     $('chat-content').innerHTML = "";
@@ -310,6 +352,8 @@ var actions = {
     }
 
     run.started = true;
+    channel.announce({ public: false });
+
 
     if(!peer) {
       channel.broadcastAsString({ start: true });

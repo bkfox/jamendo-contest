@@ -25,12 +25,16 @@ input {
 
 
 .column {
-  /* display: inline-block; */
   display: block;
   float: left;
-  width: 49%;
+  width: 75%;
   height: 100%;
   transition: height 0.2s linear;
+}
+
+.column + .column {
+  float: right;
+  width: 20%;
 }
 
 
@@ -43,14 +47,17 @@ input {
 }
 
 
-/*.box .toolbar {
-  border: none;
-  border-bottom: 1px grey solid;
-  border-radius: 5px;
-  height: 20px;
+.box.column {
+  height: 100%;
   padding: 0px;
-}*/
+  margin-bottom: 0px;
+  overflow: hidden;
+}
 
+.box.column .content-container {
+  height: calc(100% - 20px);
+  overflow: auto;
+}
 
 .toolbar {
   height: 20px;
@@ -72,12 +79,24 @@ button {
   border: 1px ;
   color: #f9fffa;
   padding: 0px 10px;
+  cursor: pointer;
+  background-color: rgba(136, 136, 255, 0.3);
 }
 
-button:hover,
-.toolbar a:hover {
+button:hover {
+  background-color: rgba(136, 170, 255, 0.6);
   background: linear-gradient(to top, #634164, #895f8a);
 }
+
+
+.big {
+  padding: 10px;
+  font-size: 20px;
+  border-radius: 10px;
+  border: 1px grey solid;
+}
+
+
 
 input[type="text"] {
   border-radius: 5px;
@@ -182,32 +201,28 @@ input[type="text"]:focus {
   color: #693f6a;
 }
 
-#index-panel button {
-  padding: 10px;
-  font-size: 20px;
-  border-radius: 10px;
-  border: 1px grey solid;
+
+#room-name-entry {
+  width: 10em;
+}
+
+
+#rooms > div,
+#rooms > p {
+  margin-top: 0px;
+  padding: 5px;
+  font-size: 10pt;
+  color: #88d;
+  background-color: white;
+  border-bottom: 1px #ddd solid;
+}
+
+#rooms > div:hover {
   cursor: pointer;
-  background-color: rgba(136, 136, 255, 0.3);
+  color: #888;
+  background-color: none;
 }
 
-
-#index-panel button:hover {
-  background-color: rgba(136, 170, 255, 0.6);
-}
-
-
-/*******************************************************************************
- *  Game Panel
- ******************************************************************************/
-#game-panel > .column:first-child {
-  width: 75%;
-}
-
-#game-panel > .column:last-child {
-  width: 20%;
-  float: right;
-}
 
 /*******************************************************************************
  *  Game Announces
@@ -451,18 +466,6 @@ input[type="text"]:focus {
 /*******************************************************************************
  *  Chat
  ******************************************************************************/
-#chat-box {
-  height: 100%;
-  padding: 0px;
-  margin-bottom: 0px;
-  overflow: hidden;
-}
-
-#chat-content-container {
-  height: calc(100% - 20px);
-  overflow: auto;
-}
-
 #chat-content {
   margin-top: -1px;
 }

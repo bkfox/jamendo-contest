@@ -30,7 +30,8 @@ Channel.prototype = {
   check: function() {
     if(Date.now() - this.time > 7200000) {
       for(var i in this.peers)
-        this.peers.ws.close();
+        if(this.peers[i].ws)
+          this.peers[i].ws.close();
       delete this.peers;
       delete channels[this.name];
     }
@@ -44,7 +45,7 @@ Channel.prototype = {
     delete this.peers[p.id];
     if(Object.keys(this.peers).length)
       try {
-        this.broadcast({ 'disconnected': true, from: p.id });
+        this.broadcast({ disconnected: true, from: p.id });
       }
       catch(e) { console.log(e + '\n' + JSON.stringify(this.getPublicPeers())); this.peers = {}; }
     else
@@ -108,6 +109,21 @@ function Client(ws) {
           peers: channel.getPublicPeers()
         }, client.id);
         return;
+      }
+
+      if(z.list != undefined) {
+        var r = [];
+        for(var i in channels)
+          if(channels[i].public)
+            r.push(i);
+        ws.send(JSON.stringify({ list: r }));
+        ws.close();
+        return;
+      }
+
+      if(z.public != undefined) {
+        console.log(channelName + ' ' + z.public);
+        channel.public = (z.public) ? true : false;
       }
 
       z.from = client.id;
