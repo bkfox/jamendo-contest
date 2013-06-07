@@ -122,7 +122,6 @@ function Client(ws) {
       }
 
       if(z.public != undefined) {
-        console.log(channelName + ' ' + z.public);
         channel.public = (z.public) ? true : false;
       }
 
