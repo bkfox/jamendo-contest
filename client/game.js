@@ -217,7 +217,7 @@ var actions = {
           set nickname(v) { peer.ui.set('name', v); if(peer.me) actions.sync(); },
           get score()     { return (peer.ui && parseInt(peer.ui.getAttribute('score'))); },
           set score(v)    { peer.ui.set('score', v); if(peer.me) actions.sync(); },
-          color:          color(80, 200),
+          color:          color(80, 180),
         }
 
         if(peer.me) {
@@ -284,6 +284,8 @@ var actions = {
       $('players').innerHTML = "";
     }
 
+
+    $('players').panel = null;
     $('chat-content').innerHTML = "";
     $('guess-off').innerHTML = "";
     $('ann-panel').off();
