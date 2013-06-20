@@ -202,6 +202,12 @@ input[type="text"]:focus {
 }
 
 
+#index-panel a {
+  color: #693f6a;
+  font-size: 12pt;
+}
+
+
 #room-name-entry {
   width: 14em;
 }
