@@ -320,7 +320,7 @@ var actions = {
       publicRooms();
 
       if(channel) {
-        channel.close()
+        channel.disconnect()
         channel = null;
       }
 

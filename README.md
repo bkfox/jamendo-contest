@@ -9,6 +9,8 @@ It encourage cooperation in the way that players give their own points to score 
 
 **Important Note**: Because it uses WebRTC, that is a technology not yet stabilized, only beta versions of web browsers, such as Firefox Nightly ( http://nightly.mozilla.org ) can run this game for the moment.
 
+The game music content comes from Jamendo ( http://jamendo.com )
+
 Demonstration
 -------------
 
