@@ -11,10 +11,7 @@ It encourage cooperation in the way that players give their own points to score 
 
 The game music content comes from Jamendo ( http://jamendo.com )
 
-Demonstration
--------------
-
-You can try a demonstration here: http://plasmaquizz.lordblackfox.net/
+It has been made for a contest, and is no more maintained.
 
 
 Screenshots
