@@ -17,17 +17,17 @@ It has been made for a contest, and is no more maintained.
 Screenshots
 -----------
 
-![Index](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/index.png)
+![Index](https://raw.github.com/bkfox/jamendo-contest/master/screenshots/index.png)
 
-![Waiting for players](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/stage0.png)
+![Waiting for players](https://raw.github.com/bkfox/jamendo-contest/master/screenshots/stage0.png)
 
-![Page of the challenger](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/stage1.png)
+![Page of the challenger](https://raw.github.com/bkfox/jamendo-contest/master/screenshots/stage1.png)
 
-![Page of the non-challengers](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/stage2.png)
+![Page of the non-challengers](https://raw.github.com/bkfox/jamendo-contest/master/screenshots/stage2.png)
 
-![Details on lyrics](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/lyrics.png)
+![Details on lyrics](https://raw.github.com/bkfox/jamendo-contest/master/screenshots/lyrics.png)
 
-![Details on configuration](https://raw.github.com/lordblackfox/jamendo-contest/master/screenshots/configuration.png)
+![Details on configuration](https://raw.github.com/bkfox/jamendo-contest/master/screenshots/configuration.png)
 
 Technical
 =========
